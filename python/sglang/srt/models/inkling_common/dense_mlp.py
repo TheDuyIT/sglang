@@ -496,8 +496,8 @@ class InklingBatchDenseMLP(nn.Module, FusedMoELoadingMixin):
         )
         global_scale = flat2[0]
         input_scale = input_amax.float().reshape(()) / (6.0 * 448.0)
-        if input_scale.item() <= 0.0:
-            # Use a neutral scale for an uncalibrated input quantizer.
+        if not (input_scale.item() > 0.0):
+            # not (x > 0.0) catches NaN in addition to <= 0; <= 0.0 alone is a no-op for NaN (IEEE 754).
             input_scale = torch.ones_like(input_scale)
         return global_scale, input_scale
 
